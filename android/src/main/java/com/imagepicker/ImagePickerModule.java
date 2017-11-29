@@ -264,6 +264,7 @@ public class ImagePickerModule extends ReactContextBaseJavaModule
 
       if(videoCaptureURI == null){
           responseHelper.invokeError(callback, "Couldn't get file path for video");
+          return;
       }
 
       cameraIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, videoQuality);
@@ -312,9 +313,12 @@ public class ImagePickerModule extends ReactContextBaseJavaModule
         List<ResolveInfo> resInfoList = reactContext.getPackageManager().queryIntentActivities(cameraIntent, PackageManager.MATCH_DEFAULT_ONLY);
         for (ResolveInfo resolveInfo : resInfoList) {
             String packageName = resolveInfo.activityInfo.packageName;
-            reactContext.grantUriPermission(packageName, cameraCaptureURI, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            reactContext.grantUriPermission(packageName, videoCaptureURI, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
+            if (cameraCaptureURI != null) {
+              reactContext.grantUriPermission(packageName, cameraCaptureURI, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
+            if (videoCaptureURI != null) {
+              reactContext.grantUriPermission(packageName, videoCaptureURI, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
         }
     }
     try

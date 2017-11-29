@@ -46,9 +46,15 @@ public class MediaUtils
                 .append(".jpg")
                 .toString();
 
-        final File path = ReadableMapUtils.hasAndNotNullReadableMap(options, "storageOptions") && !forceLocal
-                ? Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                : reactContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        String state = Environment.getExternalStorageState();
+        File path;
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            path = ReadableMapUtils.hasAndNotNullReadableMap(options, "storageOptions") && !forceLocal
+                    ? Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                    : reactContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        } else {
+            path = reactContext.getFilesDir();
+        }
 
         File result = new File(path, filename);
 
@@ -73,7 +79,13 @@ public class MediaUtils
                 .append(".mp4")
                 .toString();
 
-        final File path = reactContext.getExternalCacheDir();
+        String state = Environment.getExternalStorageState();
+        File path;
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            path = reactContext.getExternalCacheDir();
+        } else {
+            path = reactContext.getCacheDir();
+        }
 
         File result = new File(path, filename);
 
