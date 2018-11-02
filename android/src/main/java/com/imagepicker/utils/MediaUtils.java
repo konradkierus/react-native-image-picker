@@ -49,9 +49,11 @@ public class MediaUtils
         String state = Environment.getExternalStorageState();
         File path;
         if (Environment.MEDIA_MOUNTED.equals(state)) {
-            path = ReadableMapUtils.hasAndNotNullReadableMap(options, "storageOptions") && !forceLocal
-                    ? Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                    : reactContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            path = ReadableMapUtils.hasAndNotNullReadableMap(options, "storageOptions")
+                && ReadableMapUtils.hasAndNotEmptyString(options.getMap("storageOptions"), "path")
+                ? new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), options.getMap("storageOptions").getString("path"))
+                : (!forceLocal ? Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                              : reactContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES));
         } else {
             path = reactContext.getFilesDir();
         }
@@ -211,11 +213,9 @@ public class MediaUtils
 
         result = result.withResizedFile(resized);
 
-        FileOutputStream fos;
-        try
+        try (FileOutputStream fos = new FileOutputStream(result.resized))
         {
-            fos = new FileOutputStream(result.resized);
-            fos.write(bytes.toByteArray());
+            bytes.writeTo(fos);
         }
         catch (IOException e)
         {
